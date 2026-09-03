@@ -1,36 +1,49 @@
-# Global preferences
+# How I work
 
-<!-- This file is loaded into EVERY session. It is the single highest-leverage
-     thing in this repo. Keep it short and specific — vague preferences are
-     ignored, concrete rules are followed. -->
+## Build workflow
+`/kickoff` → `/fanout` → `/defend`. Plan, partition, dispatch, verify, log why.
 
-## How to work
-- Act when you have enough to act. Don't re-ask what I've already answered.
-- Make routine judgment calls yourself; ask only when two readings lead to
-  materially different work.
+- `PLAN.md` at the repo root is authoritative. Where it and the conversation
+  disagree, re-read it and fix it — don't trust recall.
+- `DECISIONS.md` records every non-obvious choice **as it is made**, with the
+  option it beat and the cost accepted. `/decide`.
+- Checkpoint with `/handoff` before a long fan-out or anything risky.
+
+## Parallel work
+Two agents editing one file race, and neither can see the other.
+
+- Shared things are **contracts**: write them as real files, in the main thread,
+  before dispatching anyone. Never hand out a described interface.
+- Every workstream owns a disjoint set of globs. If two need the same file, that
+  file is a contract, not a workstream.
+- Contracts are frozen during a round. A builder that hits a bad one reports it;
+  I change it here.
+- Max 3 concurrent builders (they inherit Opus).
+- Never dispatch an agent onto a workstream a human owns. `/brief` instead.
+
+## Working style
+- Act when you have enough to act. Don't re-ask what I've answered or re-litigate
+  a settled decision.
+- Make routine calls yourself. Ask when two readings produce materially different
+  builds — during planning, not mid-build.
 - Finish the whole task. If part is blocked, do the rest and say what you skipped.
-- Report failures plainly with the actual output. Never claim something passes
-  that you didn't run.
+- Report failures with the real output. Never claim a check passed that you didn't
+  run. A truthful failure costs less than a false pass.
 
-## Code style
-<!-- FILL IN: your real defaults. Examples to replace, not keep verbatim. -->
-- Match the surrounding file's conventions over any general style rule.
-- No comments explaining what the code does; only why, and only when non-obvious.
-- No defensive try/except around things that shouldn't fail.
-
-## Stack defaults
-<!-- FILL IN: what you reach for when unspecified, so I don't have to say it. -->
-- Frontend:
-- Backend:
-- DB:
-- Tests:
-- Package manager:
+## Code
+- Match the surrounding file's conventions over any general rule.
+- Minimum code that solves the problem. No speculative abstractions, no
+  configurability nobody asked for, no error handling for impossible cases.
+- Surgical edits: don't improve adjacent code, don't refactor what isn't broken.
+  Clean up only what your own change orphaned.
+- Comments explain why, never what, and only when non-obvious.
 
 ## Don't
-- Don't add README/CHANGELOG/docs unless asked.
-- Don't add a test framework to a project that has none without asking.
-- Don't `git commit` or `git push` unless I ask.
+- No stack assumptions — every project declares its own in `PLAN.md`.
+- No README, CHANGELOG, or docs unless asked.
+- No new dependencies without asking.
+- No `git commit` or `git push` unless I ask.
 
 ## Skills
-- **graphify** (`~/.claude/skills/graphify/SKILL.md`) — any input to knowledge graph. Trigger: `/graphify`
-  When I type `/graphify`, invoke the Skill tool with `skill: "graphify"` before anything else.
+`/graphify` — any input to knowledge graph. Invoke the Skill tool with
+`skill: "graphify"` before anything else when I type it.

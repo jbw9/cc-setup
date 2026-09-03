@@ -9,6 +9,34 @@
   "agentPushNotifEnabled": false,
   "permissions": {
     "defaultMode": "auto",
+    "allow": [
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(rg:*)",
+      "Bash(find:*)",
+      "Bash(wc:*)",
+      "Bash(npm test:*)",
+      "Bash(npm run:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm run:*)",
+      "Bash(yarn test:*)",
+      "Bash(bun test:*)",
+      "Bash(bun run:*)",
+      "Bash(pytest:*)",
+      "Bash(python3 -m pytest:*)",
+      "Bash(cargo test:*)",
+      "Bash(cargo check:*)",
+      "Bash(go test:*)",
+      "Bash(go build:*)",
+      "Bash(make:*)",
+      "Bash(tsc:*)"
+    ],
     "deny": [
       "Bash(sudo:*)",
       "Bash(rm -rf /*)",
@@ -17,10 +45,6 @@
       "Read(//Users/*/.config/gcloud/**)",
       "Read(//Users/*/Library/Keychains/**)"
     ]
-  },
-  "statusLine": {
-    "type": "command",
-    "command": "python3 __CLAUDE_DIR__/statusline.py"
   },
   "enabledPlugins": {
     "frontend-design@claude-plugins-official": true

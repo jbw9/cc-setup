@@ -1,54 +1,85 @@
-# Interview-day runbook
+# Timed-build runbook
 
 Target: usable in **under 5 minutes** on a machine you've never touched.
 
 ## Before the day
-- [ ] Ask the interviewer, in writing, whether using Claude Code and signing
-      into a personal account on their laptop is OK. Ask what happens to code
-      you push from their machine.
-- [ ] Push this repo to GitHub (public, or public gist — a private repo means a
-      `gh auth login` you don't have time for).
-- [ ] Dry-run the whole thing on a second machine or a fresh user account.
+- [ ] Ask, in writing, whether Claude Code and a personal login on their laptop
+      is acceptable, and what happens to code pushed from their machine.
+- [ ] Dry-run the clone + install on a second machine or a fresh user account.
 - [ ] Put a copy on a USB stick. Guest wifi blocks things.
-- [ ] Know your login path: browser OAuth needs a browser on *their* machine.
+- [ ] Know your login path — browser OAuth needs a browser on *their* machine.
 
-## On the day (in order)
+## Setup (~3 min)
 
-    # 1. is claude even installed? (~60s if not)
     claude --version || curl -fsSL https://claude.ai/install.sh | bash
+    git clone --depth 1 https://github.com/jbw9/cc-setup ~/cc-setup
+    ~/cc-setup/install.sh
+    claude                      # /login
+    /status                     # model opus, effort high
 
-    # 2. setup (~10s)
-    git clone --depth 1 https://github.com/<you>/claude-setup ~/claude-setup
-    ~/claude-setup/install.sh
+## The build
 
-    # 3. sign in
-    claude            # then /login
+    /kickoff <one line on what you're building>
 
-    # 4. verify before you start building
-    /status           # model opus, effort high
-    /context          # global CLAUDE.md is loaded
+Answer its questions properly — this is the highest-return five minutes of the
+session. It writes `PLAN.md`, the contract files, and `DECISIONS.md`.
 
-    # 5. seed the project
-    cp ~/claude-setup/templates/PROJECT_CLAUDE.md ./CLAUDE.md
-    # spend 2 minutes filling it in. This is the highest-return 2 minutes.
+    /fanout                     # up to 3 parallel builders, then verify
+    /handoff                    # checkpoint before anything long or risky
+    /fanout                     # next round
+
+Keep `/decide` in reach. Every time you or Claude picks something with a real
+alternative, log it in the moment — you will not reconstruct it at hour three.
+
+## Pairing and delegation
+
+When another engineer joins:
+
+    /brief WS2 @alice
+
+They get a self-contained handoff: what to build, which globs are theirs, the
+contracts quoted inline, what's already decided, and their `done-when`. Set the
+workstream's `owner:` first — `/fanout` refuses to dispatch an agent onto a
+human-owned workstream, and that check is the thing standing between you and two
+writers in one file.
+
+If they'll run their own Claude Code, put them on a separate branch or worktree.
+Two agents in one working tree collide exactly like two builders, and neither
+knows it.
+
+**What to hand off:** the workstream with the cleanest contract boundary and the
+least coupling to what you're doing live. Keep integration yourself.
+
+## Last 15 minutes
+
+    /defend
+
+Reads `PLAN.md`, `DECISIONS.md` and the diff, then interrogates you the way a
+sharp reviewer will. It flags decisions visible in the code that never made it
+into `DECISIONS.md` — those are the ones you'll get asked about with no answer
+ready.
 
 ## Before you hand the laptop back
 
-    ~/claude-setup/cleanup.sh     # logout + undo + wipe transcripts
-    rm -rf ~/claude-setup
+    ~/cc-setup/cleanup.sh       # logout + undo + wipe transcripts
+    rm -rf ~/cc-setup
 
 ## If something goes wrong
-- No network / clone blocked → USB copy, or paste `home/CLAUDE.md` into the
-  project root by hand. That alone gets you 80% of the value.
-- `python3` missing → `./install.sh --no-statusline`.
+- No network → USB copy, or paste `home/CLAUDE.md` into the project root by hand.
+  That alone gets you most of the value.
+- `python3` missing → `./install.sh --no-statusline` (the hook also no-ops
+  silently without python3; the workflow still works, it just stops surviving
+  compactions).
 - Login loops → run `claude` in a plain terminal, not the IDE extension.
-- Their laptop has an existing `~/.claude` → install.sh merges and backs up;
+- Existing `~/.claude` on their machine → install.sh merges and backs up;
   `uninstall.sh` restores it exactly.
+- Fan-out produced a merge mess → the partition was wrong. Re-run `/kickoff` on
+  the remaining work with fewer, larger workstreams.
 
-## What is deliberately NOT restored
+## Deliberately not included
 | Thing | Why |
 |---|---|
-| gstack (1.2 GB, bun deps) | minutes to install, and it's browser-QA/ship/deploy tooling you won't use in a 3-hour build. `--with-gstack` if you must. |
-| MCP servers (playwright, supabase, github, stitch) | all were project-scoped, and each needs its own auth. Add per-project with `claude mcp add` only if the task needs one. |
-| Session history, transcripts, memory | belongs to your machine, not theirs. |
-| Chrome extension / browser tooling | requires installing an extension in their Chrome. Ask first. |
+| gstack | Browser-QA/ship/deploy tooling, 1.2 GB and a `bun install` you won't use in a timed build. |
+| MCP servers | All project-scoped, each needs its own auth. Add per-project with `claude mcp add` only if the task needs one. |
+| Session history, transcripts | Belongs on your machine, not theirs. |
+| Stack defaults | On purpose. `/kickoff` asks; assuming wrong costs more than asking. |
