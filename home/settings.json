@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "model": "opus",
+  "effortLevel": "high",
+  "autoCompactEnabled": true,
+  "autoCompactWindow": 400000,
+  "tui": "fullscreen",
+  "preferredNotifChannel": "terminal_bell",
+  "agentPushNotifEnabled": false,
+  "permissions": {
+    "defaultMode": "auto",
+    "deny": [
+      "Bash(sudo:*)",
+      "Bash(rm -rf /*)",
+      "Read(//Users/*/.ssh/**)",
+      "Read(//Users/*/.aws/**)",
+      "Read(//Users/*/.config/gcloud/**)",
+      "Read(//Users/*/Library/Keychains/**)"
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "python3 __CLAUDE_DIR__/statusline.py"
+  },
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true
+  }
+}
