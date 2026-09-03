@@ -4,9 +4,19 @@ My Claude Code environment: a plan-first, fan-out build workflow that travels.
 Clone it on any machine and be working in under a minute.
 
 ```sh
-git clone --depth 1 https://github.com/jbw9/cc-setup ~/cc-setup
-~/cc-setup/install.sh
+curl -fsSL https://github.com/jbw9/cc-setup/archive/refs/heads/main.tar.gz | tar xz -C ~ \
+  && ~/cc-setup-main/install.sh
 ```
+
+No git, no GitHub account, no credentials — it's a public tarball. Use this on a
+machine that isn't yours. If you'd rather have a working tree:
+
+```sh
+git clone --depth 1 https://github.com/jbw9/cc-setup ~/cc-setup && ~/cc-setup/install.sh
+```
+
+(Cloning a public repo is anonymous too — GitHub auth is only for private repos
+and for pushing.)
 
 Then `claude`, `/login`, `/kickoff`. See **[RUNBOOK.md](RUNBOOK.md)** for the
 timed-build checklist, and **[ARCHITECTURE.md](ARCHITECTURE.md)** for why any of

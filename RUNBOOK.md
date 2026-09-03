@@ -9,13 +9,30 @@ Target: usable in **under 5 minutes** on a machine you've never touched.
 - [ ] Put a copy on a USB stick. Guest wifi blocks things.
 - [ ] Know your login path — browser OAuth needs a browser on *their* machine.
 
-## Setup (~3 min)
+## Setup (~1 min)
+
+Recon first, because on a machine that isn't yours the config belongs to someone
+else — and a managed policy silently outranks anything you set:
+
+    ls "/Library/Application Support/ClaudeCode/managed-settings.json"
+    cat ~/.claude/settings.json
+
+Then install. Needs no git and no GitHub account:
 
     claude --version || curl -fsSL https://claude.ai/install.sh | bash
-    git clone --depth 1 https://github.com/jbw9/cc-setup ~/cc-setup
-    ~/cc-setup/install.sh
-    claude                      # /login
-    /status                     # model opus, effort high
+    curl -fsSL https://github.com/jbw9/cc-setup/archive/refs/heads/main.tar.gz \
+      | tar xz -C ~ && ~/cc-setup-main/install.sh
+    claude                      # /login if the account isn't yours
+    /status                     # model opus, effort high, Setting sources
+
+Install **before** launching Claude. A SessionStart hook only fires at session
+start, so a session that's already running won't have it.
+
+If `/status` shows `Enterprise managed settings (file)`, a policy is overriding
+you — `claude doctor` lists what got dropped. The likely casualties are Opus
+(`availableModels`), auto mode (`permissions.defaultMode`), and hooks
+(`disableAllHooks`). If Opus is locked out, set `model: sonnet` in
+`~/.claude/agents/builder.md`; the rest of the design is unaffected.
 
 ## The build
 
@@ -61,8 +78,8 @@ ready.
 
 ## Before you hand the laptop back
 
-    ~/cc-setup/cleanup.sh       # logout + undo + wipe transcripts
-    rm -rf ~/cc-setup
+    ~/cc-setup-main/cleanup.sh  # logout + undo + wipe transcripts
+    rm -rf ~/cc-setup-main
 
 ## If something goes wrong
 - No network → USB copy, or paste `home/CLAUDE.md` into the project root by hand.
