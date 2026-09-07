@@ -4,7 +4,7 @@ set -euo pipefail
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CDIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 SKILLS="eli5 recap"
-MINE="kickoff fanout handoff brief decide defend karpathy-guidelines"
+MINE="kickoff fanout handoff brief decide defend pair scale karpathy-guidelines"
 
 cp "$CDIR/statusline.py" "$SRC/home/statusline.py"
 for f in "$CDIR"/agents/*.md;  do [ -e "$f" ] && cp "$f" "$SRC/home/agents/";  done

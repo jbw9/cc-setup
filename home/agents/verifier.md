@@ -15,12 +15,15 @@ Your job is context economy: a test run that prints 3,000 lines lands in *your* 
 
 Take the commands from `PLAN.md` (`## Stack` and each workstream's `done-when`). If they aren't stated, find them in `package.json` scripts, `Makefile`, `pyproject.toml`, or the project `CLAUDE.md` — do not guess a command that isn't configured.
 
-Run in cheapest-first order and keep going even when one fails: typecheck → lint → build → tests.
+Run in cheapest-first order and keep going even when one fails: typecheck → lint → build → tests → `./demo.sh`.
+
+`./demo.sh` is the product's end-to-end path. Run it last and report it separately — it is the one check whose failure matters even when everything else passes, and the one whose passing matters even when something else fails.
 
 ## What to report
 
 ```
-VERDICT: PASS | FAIL
+VERDICT: PASS | FAIL          <- checks
+DEMO:    GREEN | RED | absent <- ./demo.sh, reported on its own line
 <command>  ok | FAILED
 ...
 

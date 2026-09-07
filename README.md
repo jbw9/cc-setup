@@ -62,21 +62,29 @@ this is shaped the way it is.
 ## The workflow
 
 ```
-/kickoff  →  /fanout  →  /defend
+/kickoff  →  spine  →  /fanout ⟲  →  /defend  →  /scale
 ```
 
 | | |
 |---|---|
-| `/kickoff` | Interrogates the request until nothing material is ambiguous, then writes `PLAN.md`: frozen contracts, workstreams with disjoint file ownership, and a `done-when` command each. Writes the contracts as real files. |
-| `/fanout` | Dispatches up to 3 parallel `builder` agents on non-overlapping globs, fans in, runs `verifier`, harvests decisions. |
+| `/kickoff` | Interrogates the request, then builds the **spine** — the thinnest path through every layer, serial, before anything is frozen. Derives the contracts from that running code and writes `PLAN.md`: workstreams with disjoint file ownership, a tier, and a `done-when` command each. |
+| `/fanout` | Dispatches up to 3 parallel `builder` agents on non-overlapping globs, fans in, runs `verifier` **and `demo.sh`**, reads back what each builder wrote, harvests decisions, commits on green. |
+| `/pair` | Someone is sitting down with you: lands what's in flight, quiesces the agents, and produces a 60-second walkthrough plus candidate tasks to pair on. |
 | `/brief` | Hands a workstream to a human teammate instead of an agent. |
-| `/decide` | Logs a choice to `DECISIONS.md` the moment it's made — with the option it beat. |
+| `/decide` | Logs a choice to `DECISIONS.md` the moment it's made — with the option it beat, the cost, and where it breaks at scale. |
 | `/handoff` | Checkpoints state into `PLAN.md` so it survives a compaction. |
 | `/defend` | Rehearses the "why this over that" questions before you present. |
+| `/scale` | Turns the accumulated `At scale:` lines into `SCALE.md` — what breaks first, at what volume, and what replaces it. |
 
-The one idea underneath all of it: **parallel agents cannot coordinate**, so
-anything two of them would touch is written first, as a file, by the main thread.
-After that they can't collide.
+Two ideas underneath all of it.
+
+**Parallel agents cannot coordinate**, so anything two of them would touch is
+written first, as a file, by the main thread. After that they can't collide.
+
+**You have to defend what they wrote.** Agents outproduce the rate a human can
+absorb code, so the spine comes before the breadth, the demo path is a file that
+gets run every round, and every fan-in ends by reading back what actually
+landed. Throughput is not the constraint — explaining it afterwards is.
 
 ## What it installs
 
@@ -85,8 +93,8 @@ After that they can't collide.
 | `home/CLAUDE.md` | working style and the parallelism rules — no stack assumptions |
 | `home/settings.json` | opus · high effort · auto mode · 400k compact window · dev-command allowlist · deny rules for `sudo`, `~/.ssh`, `~/.aws`, keychain |
 | `home/agents/` | `builder` (one workstream, own files only) · `verifier` (checks, short verdict) |
-| `home/skills/` | the six workflow skills, plus eli5, recap, karpathy-guidelines |
-| `home/hooks/inject-plan.sh` | `SessionStart` hook — re-injects `PLAN.md` state after a compaction |
+| `home/skills/` | the eight workflow skills, plus eli5, recap, karpathy-guidelines |
+| `home/hooks/inject-plan.sh` | `SessionStart` hook — re-injects `PLAN.md` status, demo path, contracts and the clock after a compaction |
 | `home/statusline.py` | dir · model · context% · 5h usage% · cost · diff · branch |
 | plugin | `frontend-design` from the official marketplace (best effort) |
 

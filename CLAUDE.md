@@ -29,7 +29,9 @@ because this often runs on a machine that isn't the user's.
 - `home/settings.json` must not contain absolute paths. `install.sh` injects the
   `statusLine` and hook commands at install time with the real config dir.
 - `argument-hint` values must be quoted. `[a] [b]` is invalid YAML and the
-  frontmatter silently fails to parse.
+  frontmatter silently fails to parse. The closing `---` also needs its own
+  line — gluing it to the end of `argument-hint:` parses, but the hint carries
+  a stray fence.
 - After changing any script: `bash -n` it, then install into a throwaway
   `CLAUDE_CONFIG_DIR` seeded with a conflicting `CLAUDE.md`, `settings.json`,
   a same-named skill and a pre-existing `SessionStart` hook, and confirm
@@ -38,5 +40,7 @@ because this often runs on a machine that isn't the user's.
   `home/settings.json` are hand-maintained; diff them rather than overwriting.
 
 `ARCHITECTURE.md` explains why the workflow is shaped this way. Read it before
-changing the agent or skill contracts — the disjoint-file-ownership rule is
-load-bearing, not stylistic.
+changing the agent or skill contracts. Three rules are load-bearing rather than
+stylistic: disjoint file ownership (D2), the spine before the breadth (D9), and
+reading back what the builders wrote (D11). The first makes parallelism safe;
+the other two are what make its output defensible afterwards.

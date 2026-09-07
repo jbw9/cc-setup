@@ -102,6 +102,60 @@ Because:  With that flag the description stays out of context entirely — the
           order that matters; auto-invocation would fire them at the wrong time.
 Costs us: You have to remember they exist. `CLAUDE.md` names the sequence.
 
+## D9 · Spine before breadth
+Chose:    A serial Round 0 that builds the thinnest path through every layer,
+          then derives the contracts from that running code and freezes them.
+Over:     Writing the contracts up front from the plan and fanning out immediately
+          (the original shape of this workflow).
+Because:  D2 is right that agents need materialized contracts, but it said nothing
+          about where the contracts come from. Written from a plan they are
+          guesses, and a wrong one surfaces at fan-in with three builders' work
+          stacked on top of it. Derived from a spine that runs, they are
+          descriptions of something already true. The second effect matters more
+          on a clock: from the moment the spine is green there is always something
+          demoable, so a bad round costs a round instead of the whole build.
+Costs us: Roughly a sixth of the clock spent with no parallelism running, at the
+          point in the day when fanning out feels most urgent. That urgency is
+          the reason this is the default rather than a judgment call in the room.
+
+## D10 · The demo path is a file
+Chose:    `demo.sh` at the repo root, written during Round 0, run at every fan-in.
+Over:     `done-when` commands per workstream, plus the verifier's build/typecheck.
+Because:  Per-workstream checks can all pass while the product doesn't run — the
+          failure is invisible precisely because everything looks green. On a
+          timed build the only state that matters is whether the thing works end
+          to end, and the same logic as D2 applies: a described demo path drifts,
+          a script doesn't.
+Costs us: One more thing to keep green, and it will sometimes be the thing
+          blocking a round that was otherwise fine. That is the point.
+
+## D11 · Read back what the builders wrote
+Chose:    A mandatory fan-in step where the main thread reads each builder's diff
+          and reports what actually landed.
+Over:     Trusting the verifier's verdict, which is what D5 was designed for.
+Because:  D5 optimizes for context economy and is correct about tokens. It is
+          wrong about people: three Opus builders outproduce the rate a human can
+          absorb code, and unread code cannot be explained under questioning. This
+          buys back the comprehension D5 trades away, at a cost D5 was right to
+          avoid paying for raw output.
+Costs us: Real context and real minutes every round, spent re-reading work that
+          already passed its checks. Cheaper than the alternative, which is
+          discovering at presentation time that a third of the codebase is
+          unfamiliar.
+
+## D12 · `At scale:` on every decision
+Chose:    A fourth required field on every `DECISIONS.md` entry, and `/scale` to
+          compose them.
+Over:     Writing the production-architecture story at the end, from the finished
+          code.
+Because:  The scale answer is graded separately from the build, and it is composed
+          of judgments made throughout it — each one obvious in the moment it was
+          made and unrecoverable an hour later. Accumulated a line at a time it
+          costs nothing; reconstructed at the end it is a guess about your own
+          reasoning.
+Costs us: One more line to fill in at every `/decide`, including the ones where
+          the honest answer is "no idea, I'd measure it."
+
 ---
 
 ## Known weaknesses
@@ -112,5 +166,8 @@ Costs us: You have to remember they exist. `CLAUDE.md` names the sequence.
 - **`PLAN.md` drift** is the most likely failure mode in practice.
 - **No cross-agent progress visibility.** A builder heading the wrong way runs to
   completion before anyone finds out.
-- **Contracts frozen too early** produce a round of rework. This is a real cost,
-  accepted knowingly in exchange for safe parallelism.
+- **Contracts frozen too early** produce a round of rework. D9 reduces this by
+  deriving them from a running spine, but a contract can still be frozen before
+  the breadth reveals what it needed to be.
+- **The spine can be built too thick.** Round 0 is supposed to be embarrassing.
+  A spine that grows error handling and abstraction is just the serial build.

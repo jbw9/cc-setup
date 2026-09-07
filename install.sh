@@ -142,13 +142,15 @@ done. next:
   2. /status           # confirm model=opus, effort=high
   3. /kickoff <what you're building>
 
-workflow:  /kickoff -> /fanout -> /defend
-  /kickoff   interrogate, then write PLAN.md + contracts + DECISIONS.md
-  /fanout    dispatch parallel builders on disjoint files, verify, harvest decisions
+workflow:  /kickoff -> spine -> /fanout -> /defend -> /scale
+  /kickoff   interrogate, build the spine, freeze contracts, write PLAN.md
+  /fanout    dispatch parallel builders, verify, read back the diffs, commit
+  /pair      get ready for someone sitting down with you mid-build
   /brief     hand a workstream to a human teammate
   /decide    log a choice the moment it's made
   /handoff   checkpoint state so it survives a compaction
   /defend    rehearse the architecture questions before you present
+  /scale     turn the At scale: lines into SCALE.md
 
 undo everything:  $SRC/uninstall.sh
 leaving the machine:  $SRC/cleanup.sh

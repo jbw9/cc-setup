@@ -2,7 +2,8 @@
 name: brief
 description: Generate a self-contained handoff for a human teammate taking a workstream — what to build, which files are theirs, the frozen contracts, and what not to touch.
 disable-model-invocation: true
-argument-hint: "[workstream id] [who]"---
+argument-hint: "[workstream id] [who]"
+---
 
 Write a handoff a teammate can act on without reading `PLAN.md` and without interrupting you. Output it as a single block they can paste into Slack or a branch description.
 
