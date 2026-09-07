@@ -43,7 +43,3 @@ Two agents editing one file race, and neither can see the other.
 - No README, CHANGELOG, or docs unless asked.
 - No new dependencies without asking.
 - No `git commit` or `git push` unless I ask.
-
-## Skills
-`/graphify` — any input to knowledge graph. Invoke the Skill tool with
-`skill: "graphify"` before anything else when I type it.

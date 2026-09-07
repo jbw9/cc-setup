@@ -3,7 +3,7 @@
 set -euo pipefail
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CDIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
-SKILLS="graphify apple-design visual-plan eli5 recap"
+SKILLS="eli5 recap"
 MINE="kickoff fanout handoff brief decide defend karpathy-guidelines"
 
 cp "$CDIR/statusline.py" "$SRC/home/statusline.py"

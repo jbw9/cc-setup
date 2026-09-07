@@ -85,7 +85,7 @@ After that they can't collide.
 | `home/CLAUDE.md` | working style and the parallelism rules — no stack assumptions |
 | `home/settings.json` | opus · high effort · auto mode · 400k compact window · dev-command allowlist · deny rules for `sudo`, `~/.ssh`, `~/.aws`, keychain |
 | `home/agents/` | `builder` (one workstream, own files only) · `verifier` (checks, short verdict) |
-| `home/skills/` | the six workflow skills, plus graphify, visual-plan, apple-design, eli5, recap, karpathy-guidelines |
+| `home/skills/` | the six workflow skills, plus eli5, recap, karpathy-guidelines |
 | `home/hooks/inject-plan.sh` | `SessionStart` hook — re-injects `PLAN.md` state after a compaction |
 | `home/statusline.py` | dir · model · context% · 5h usage% · cost · diff · branch |
 | plugin | `frontend-design` from the official marketplace (best effort) |
