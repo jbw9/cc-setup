@@ -10,16 +10,25 @@ Target: usable in **under 5 minutes** on a machine you've never touched.
       `install` on guest wifi is dead clock — know which stacks are warm before
       you pick one.
 - [ ] Dry-run the clone + install on a second machine or a fresh user account.
+- [ ] Print or copy `templates/KICKOFF_NOTES.md`. You fill it in *during* the
+      briefing — that window costs no build clock, and `/kickoff <notes file>`
+      reads it instead of interrogating you at minute five.
 - [ ] Put a copy on a USB stick. Guest wifi blocks things.
 - [ ] Know your login path — browser OAuth needs a browser on *their* machine.
 
 ## Setup (~1 min)
 
 Recon first, because on a machine that isn't yours the config belongs to someone
-else — and a managed policy silently outranks anything you set:
+else — a managed policy silently outranks anything you set, and which toolchains
+are warm decides what stack is cheap to build in:
 
-    ls "/Library/Application Support/ClaudeCode/managed-settings.json"
-    cat ~/.claude/settings.json
+    ~/cc-setup-main/preflight.sh
+
+Five seconds. Reports runtimes, package-manager caches and their sizes, registry
+reachability, and whether managed settings are in play. **A toolchain that's
+installed with a populated cache costs a minute to start; one that needs a
+runtime install over guest wifi can cost thirty.** Make that a stack input
+before the clock starts, not a discovery at minute five.
 
 Then install. Needs no git and no GitHub account:
 
@@ -45,7 +54,7 @@ prove it end to end before going wide, and stop building well before you stop.
 
 | When | What |
 |---|---|
-| **T+0** | `/kickoff <one line>` — answer its questions properly. If you were just briefed, paste your notes as the argument; it reads a file and asks only about real gaps. It writes `PLAN.md` (with `## Time`), the project `CLAUDE.md`, and `DECISIONS.md`. |
+| **T+0** | `/kickoff notes.md` — hand it the notes you filled in during the briefing. It reads them and asks only about genuine gaps. Writes `PLAN.md` (with `## Time`), the project `CLAUDE.md`, and `DECISIONS.md`. Cap this at ~15 minutes: past that you are planning against a problem you don't understand yet, and the spine will teach you more than more planning would. |
 | **T+6%** | **Round 0 — the spine.** Serial, no agents. One hardcoded input → one real transformation → one endpoint → one thing rendered. Then `demo.sh`. |
 | **T+16%** | Spine green. **You are now demoable.** Contracts get derived from the code that just ran and frozen. |
 | | `/fanout` — round 1. Fan in: verifier, `./demo.sh`, read back every builder's diff, harvest decisions, commit. |
@@ -54,6 +63,11 @@ prove it end to end before going wide, and stop building well before you stop.
 | **T−45m** | **Freeze.** No new workstreams. Integration, demo rehearsal, backfilling `DECISIONS.md`. Unfinished work is a `CUT` — say so. |
 | **T−30m** | `/scale` → `SCALE.md`. |
 | **T−15m** | `/defend`. |
+
+**While a round runs, you are not idle.** That is the window for reading the
+previous round's diff, writing the `/decide` entries you skipped, and rehearsing
+`./demo.sh`. Over half of a timed build is serial work that no number of agents
+touches — dispatch time is the only stretch where it overlaps with anything.
 
 Keep `/decide` in reach the whole way. Every time you or Claude picks something
 with a real alternative, log it in the moment — you will not reconstruct it at

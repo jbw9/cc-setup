@@ -92,7 +92,7 @@ landed. Throughput is not the constraint — explaining it afterwards is.
 |---|---|
 | `home/CLAUDE.md` | working style and the parallelism rules — no stack assumptions |
 | `home/settings.json` | opus · high effort · auto mode · 400k compact window · dev-command allowlist · deny rules for `sudo`, `~/.ssh`, `~/.aws`, keychain |
-| `home/agents/` | `builder` (one workstream, own files only) · `verifier` (checks, short verdict) |
+| `home/agents/` | `builder` (one workstream, own files only) · `builder-fast` (same, on Sonnet, for mechanical breadth) · `verifier` (checks, short verdict) |
 | `home/skills/` | the eight workflow skills, plus eli5, recap, karpathy-guidelines |
 | `home/hooks/inject-plan.sh` | `SessionStart` hook — re-injects `PLAN.md` status, demo path, contracts and the clock after a compaction |
 | `home/statusline.py` | dir · model · context% · 5h usage% · cost · diff · branch |
@@ -100,6 +100,12 @@ landed. Throughput is not the constraint — explaining it afterwards is.
 
 Flags: `--with-stitch` (Stitch/shadcn/Remotion/design-md skills),
 `--no-statusline`.
+
+Two things that aren't installed but matter on a clock:
+`./preflight.sh` — five-second recon of a machine you're about to build on
+(runtimes, which package caches are populated, registry reachability, managed
+settings), and `templates/KICKOFF_NOTES.md`, which you fill in during the
+briefing and hand to `/kickoff` so it skips the interrogation.
 
 The workflow skills are all `disable-model-invocation: true`, so their
 descriptions stay out of context entirely — they cost nothing until you type them.

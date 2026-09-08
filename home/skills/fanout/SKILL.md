@@ -13,7 +13,14 @@ Dispatch builders for the workstreams named in `$ARGUMENTS`, or every ready work
 2. **Round 0 landed.** `./demo.sh` exists and passes. Fanning out before the spine runs means freezing contracts that are still guesses — that is the failure this setup is shaped to avoid. If there is no spine yet, go back to `/kickoff` Phase 4.
 3. **Contracts are on disk.** Every file named in `## Contracts` exists and holds real types derived from the spine. If any is missing, write it now, in this thread, before dispatching.
 4. **No shared files.** Compare the `owns:` globs of the workstreams you're about to dispatch. Any overlap — even one path matching two globs — means separate rounds, not together.
-5. **At most 3 concurrent.** Builders inherit Opus. Beyond three the wall-clock gain flattens and the 5-hour limit gets real. If the usage meter is past two thirds, drop to two, or set `model: sonnet` in `agents/builder.md` for mechanical workstreams.
+5. **At most 3 concurrent** — and two is often better than three. The third workstream is usually the one with the muddiest boundary, and it pays you back as integration work, which is serial and yours. Fewer, larger, cleaner-edged workstreams beat more of them.
+
+## Which builder
+
+- `builder` (Opus) — novel logic, anything where the plan leaves a judgment call, the workstream you'd struggle to specify precisely.
+- `builder-fast` (Sonnet) — mechanical breadth against a frozen contract: CRUD, wiring, rendering a known shape, boilerplate. Materially faster wall-clock, and the contract is doing the thinking.
+
+Route by how well-specified the workstream is, not by how important it is. A `MUST`-tier workstream that is completely pinned down by its contract is a `builder-fast` job. If the usage meter is past two thirds with a third of the clock left, route everything you can to `builder-fast`.
 
 **Dispatch only `owner: builder` workstreams.** One owned by `me` or a teammate is off limits — sending an agent into a human's files while they work is the same race, and they can't see it coming. Use `/brief`.
 
@@ -33,6 +40,8 @@ Finish by running your done-when and reporting its real output.
 ```
 
 The builder reads its own instructions from `PLAN.md`. Your paraphrase can only introduce drift.
+
+**While the round runs, the user is not idle.** This is the window for reading the *previous* round's diff, writing the `/decide` entries that got skipped, and rehearsing `./demo.sh`. Say so when you dispatch — the serial work is the build's real ceiling, and this is the only time it overlaps with anything.
 
 ## Fan in
 
