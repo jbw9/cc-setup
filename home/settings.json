@@ -40,10 +40,12 @@
     "deny": [
       "Bash(sudo:*)",
       "Bash(rm -rf /*)",
-      "Read(//Users/*/.ssh/**)",
-      "Read(//Users/*/.aws/**)",
-      "Read(//Users/*/.config/gcloud/**)",
-      "Read(//Users/*/Library/Keychains/**)"
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.config/gcloud/**)",
+      "Read(~/Library/Keychains/**)",
+      "Read(~/.gnupg/**)",
+      "Read(~/.kube/**)"
     ]
   },
   "enabledPlugins": {

@@ -61,9 +61,13 @@ fi
 say ""
 say "==> claude code"
 row "claude" "$(ver claude)"
-M="/Library/Application Support/ClaudeCode/managed-settings.json"
-[ -f "$M" ] && row "managed" "PRESENT — a policy outranks your settings. Run 'claude doctor'." \
-            || row "managed" "none"
+MANAGED=""
+for M in "/Library/Application Support/ClaudeCode/managed-settings.json" \
+         "/etc/claude-code/managed-settings.json"; do
+  [ -f "$M" ] && MANAGED="$M"
+done
+[ -n "$MANAGED" ] && row "managed" "PRESENT ($MANAGED) — a policy outranks your settings. Run 'claude doctor'." \
+                  || row "managed" "none"
 [ -e "$HOME/.claude/settings.json" ] && row "existing" "$HOME/.claude/settings.json — install.sh will merge + back up" \
                                     || row "existing" "clean"
 

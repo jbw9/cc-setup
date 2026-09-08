@@ -30,13 +30,27 @@ installed with a populated cache costs a minute to start; one that needs a
 runtime install over guest wifi can cost thirty.** Make that a stack input
 before the clock starts, not a discovery at minute five.
 
-Then install. Needs no git and no GitHub account:
+Then install. Needs no git and no GitHub account.
+
+**On their machine, use the isolated install.** It puts the whole environment in
+one folder, never reads or writes their `~/.claude`, and strips the `ANTHROPIC_*`
+and `CLAUDE_*` variables their shell profile may be exporting — a stray
+`ANTHROPIC_BASE_URL` silently repoints every request, and settings files cannot
+override an env var:
 
     claude --version || curl -fsSL https://claude.ai/install.sh | bash
     curl -fsSL https://github.com/jbw9/cc-setup/archive/refs/heads/main.tar.gz \
-      | tar xz -C ~ && ~/cc-setup-main/install.sh
-    claude                      # /login if the account isn't yours
+      | tar xz -C ~ && ~/cc-setup-main/isolate.sh
+    cd ~/cc-build
+    ./claude-iso                # the launcher — NOT `claude`
+    /login                      # scoped to this folder
     /status                     # model opus, effort high, Setting sources
+
+Read what `isolate.sh` prints. It names the env vars it stripped, any ancestor
+`CLAUDE.md` that will load regardless (the upward walk can't be turned off — if
+one exists, build somewhere else), and any managed policy.
+
+Use `install.sh` instead only on a machine that is yours.
 
 Install **before** launching Claude. A SessionStart hook only fires at session
 start, so a session that's already running won't have it.
@@ -44,8 +58,8 @@ start, so a session that's already running won't have it.
 If `/status` shows `Enterprise managed settings (file)`, a policy is overriding
 you — `claude doctor` lists what got dropped. The likely casualties are Opus
 (`availableModels`), auto mode (`permissions.defaultMode`), and hooks
-(`disableAllHooks`). If Opus is locked out, set `model: sonnet` in
-`~/.claude/agents/builder.md`; the rest of the design is unaffected.
+(`disableAllHooks`). Opus being locked out needs no fix — `builder` is `model: inherit` and follows
+the main model down; the rest of the design is unaffected.
 
 ## The build
 
@@ -76,7 +90,7 @@ hour three, and the `At scale:` lines are what `/scale` is built from.
 Watch two numbers on the status line: **context %** and **5h usage %**. Three
 Opus builders over a long build will find the usage limit. If it's past two
 thirds with a third of the clock left, drop to two concurrent or put
-`model: sonnet` in `~/.claude/agents/builder.md` for the mechanical workstreams.
+`builder-fast` (Sonnet) for the mechanical workstreams.
 
 ### Why the spine comes first
 
@@ -138,12 +152,21 @@ have only ever seen a machine run is a demo path you have not rehearsed.
 
 ## Before you hand the laptop back
 
-    ~/cc-setup-main/cleanup.sh  # logout + undo + wipe transcripts
+    ~/cc-build/teardown.sh      # scoped logout, then deletes the whole folder
     rm -rf ~/cc-setup-main
+
+Do not skip the logout. Settings, skills, transcripts and the account id all
+live inside `~/cc-build` and go with it — but on macOS the OAuth credential is
+in the login keychain, which no directory scoping reaches. `teardown.sh` runs
+the logout through the launcher so it targets your config and not theirs.
+
+If you used the global `install.sh` instead: `~/cc-setup-main/cleanup.sh`.
 
 ## If something goes wrong
 - No network → USB copy, or paste `home/CLAUDE.md` into the project root by hand.
   That alone gets you most of the value.
+- Ran `claude` instead of `./claude-iso` → you were using their config, not
+  yours. Quit, run the launcher, and re-check `/status`.
 - `python3` missing → `./install.sh --no-statusline` (the hook also no-ops
   silently without python3; the workflow still works, it just stops surviving
   compactions).

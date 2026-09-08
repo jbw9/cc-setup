@@ -9,7 +9,7 @@ CDIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 read -r -p "Sign out of Claude and wipe local session data in $CDIR? [y/N] " a
 [ "$a" = y ] || [ "$a" = Y ] || { echo "aborted"; exit 0; }
 
-command -v claude >/dev/null 2>&1 && claude logout 2>/dev/null || true
+command -v claude >/dev/null 2>&1 && claude auth logout 2>/dev/null || true
 bash "$SRC/uninstall.sh" || true
 
 rm -rf "$CDIR"/projects "$CDIR"/sessions "$CDIR"/history.jsonl \
