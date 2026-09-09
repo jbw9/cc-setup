@@ -5,6 +5,8 @@ disable-model-invocation: true
 argument-hint: "[who is joining, optional]"
 ---
 
+First, make sure they can actually see your work: commit anything outstanding and, if they are on their own clone rather than a worktree here, push. The `wip:` checkpoints keep this close to true on their own, but "close to true" is not what you want at the moment someone starts reading your code. Tell them the branch and the last commit.
+
 Someone is about to sit down and work with you for a fixed slot. This is not `/brief` — they aren't taking a workstream away, they're going to ask what you've built, why, and where you're headed, then work on something with you.
 
 Run this **before** they arrive, not when they're already sitting there.

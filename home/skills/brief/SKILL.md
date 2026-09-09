@@ -5,7 +5,7 @@ disable-model-invocation: true
 argument-hint: "[workstream id] [who]"
 ---
 
-Write a handoff a teammate can act on without reading `PLAN.md` and without interrupting you. Output it as a single block they can paste into Slack or a branch description.
+Write a handoff a teammate can act on without reading `PLAN.md` and without interrupting you. Include the branch and the commit they should start from, and tell them to pull before they begin and again before they merge: this repo is checkpointed every few minutes, so what they cloned goes stale faster than they will expect. Output it as a single block they can paste into Slack or a branch description.
 
 The partition in `PLAN.md` already solves the human problem too: two engineers editing the same file race exactly the way two agents do. A workstream is a delegation unit whether the owner is `builder` or a person.
 

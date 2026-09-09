@@ -158,6 +158,24 @@ Costs us: One more line to fill in at every `/decide`, including the ones where
 
 ---
 
+## D13 · Checkpoint commits on a clock, from a `Stop` hook
+Chose:    A `Stop` hook that commits the tree every ~10 minutes as `wip:`, gated
+          on `PLAN.md` existing, alongside `/fanout`'s verified green commits.
+Over:     Relying on the fan-in commit alone, or a rule in `CLAUDE.md` telling the
+          model to commit often.
+Because:  The fan-in commit is the right rollback point but the wrong cadence for
+          a second person. Rounds run 20-40 minutes and Round 0 has no fan-in at
+          all, so a teammate can be an hour behind while every commit that exists
+          is perfectly correct. And a `CLAUDE.md` rule is the first thing a model
+          drops under load, which is exactly when the build is moving fastest and
+          staleness costs the most. A hook cannot forget. `Stop` fires between
+          turns, never mid-edit; `SubagentStop` is left unwired because a
+          fan-out round is not coherent until fan-in.
+Costs us: Two kinds of commit in one log, so a rollback point now needs
+          `--grep='^wip:' --invert-grep` to find. The checkpoints are unverified
+          by construction — that is the trade for taking them on a clock rather
+          than on a green check.
+
 ## Known weaknesses
 
 - **Partition quality is the whole ballgame.** A bad workstream split produces
@@ -171,3 +189,7 @@ Costs us: One more line to fill in at every `/decide`, including the ones where
   the breadth reveals what it needed to be.
 - **The spine can be built too thick.** Round 0 is supposed to be embarrassing.
   A spine that grows error handling and abstraction is just the serial build.
+- **Checkpoints commit unreviewed work.** D13 trades correctness of the log for
+  freshness of the tree. The guards catch the expensive mistakes — secrets,
+  vendor directories, a tree with no `.gitignore` — but a checkpoint can still
+  commit something half-thought-out, because that is what the tree contained.

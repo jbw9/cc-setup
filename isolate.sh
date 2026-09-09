@@ -100,6 +100,8 @@ done. everything lives in $WORK — nothing else on this machine was modified.
 
   cd $WORK
   ./claude-iso            # instead of \`claude\`; /login is scoped to this dir
+                          # CC_CHECKPOINT_PUSH=1 ./claude-iso  if someone pairing
+                          # has their own clone and needs your commits pushed
   /status                 # confirm model=opus, effort=high, no managed policy
   /kickoff <what you're building>
 

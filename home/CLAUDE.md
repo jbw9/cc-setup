@@ -63,6 +63,16 @@ later — by then it's too late to learn it.
 - No stack assumptions — every project declares its own in `PLAN.md`.
 - No README, CHANGELOG, or docs unless asked.
 - No new dependencies without asking.
-- No `git push` unless I ask. Committing is different: when `PLAN.md` has a
-  `## Time` block, commit after every green fan-in round — that's the rollback
-  point that makes the next round safe to attempt.
+- No `git push` unless I ask (`CC_CHECKPOINT_PUSH=1` is me asking, standing).
+- Committing is different, and there are two kinds:
+  - **Green commits.** After every green fan-in round, when `PLAN.md` has a
+    `## Time` block. These are the rollback points that make the next round safe
+    to attempt. `/fanout` makes them; write a real message naming the workstreams.
+  - **`wip:` checkpoints.** The `Stop` hook commits the tree every ~10 minutes so
+    that anyone pulling this repo is working on current files. It is automatic —
+    don't make them by hand, don't clean them up mid-build, and don't treat one
+    as evidence anything passed. Rollback points are
+    `git log --grep='^wip:' --invert-grep`.
+- A checkpoint appearing in the middle of your work is expected, not a conflict.
+  If one committed something it shouldn't have, say so — don't rewrite history
+  during a timed build.

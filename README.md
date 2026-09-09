@@ -133,6 +133,7 @@ landed. Throughput is not the constraint — explaining it afterwards is.
 | `home/agents/` | `builder` (one workstream, own files only) · `builder-fast` (same, on Sonnet, for mechanical breadth) · `verifier` (checks, short verdict) |
 | `home/skills/` | the eight workflow skills, plus eli5, recap, karpathy-guidelines |
 | `home/hooks/inject-plan.sh` | `SessionStart` hook — re-injects `PLAN.md` status, demo path, contracts and the clock after a compaction |
+| `home/hooks/checkpoint.sh` | `Stop` hook — commits the tree every ~10 min so nobody pulling this repo is stale |
 | `home/statusline.py` | dir · model · context% · 5h usage% · cost · diff · branch |
 | plugin | `frontend-design` from the official marketplace (best effort) |
 
@@ -151,6 +152,51 @@ briefing and hand to `/kickoff` so it skips the interrogation.
 The eight workflow skills are all `disable-model-invocation: true`, so their
 descriptions stay out of context entirely — they cost nothing until you type them.
 (`eli5`, `recap` and `karpathy-guidelines` are model-invocable on purpose.)
+
+## Checkpoint commits
+
+`checkpoint.sh` runs on `Stop` — when the main thread finishes a turn, so never
+mid-edit — and commits the working tree if it has been more than ten minutes and
+anything actually changed. It exists for one reason: a teammate who pulled forty
+minutes ago is editing files that have moved under them, and neither of you finds
+out until the merge.
+
+**It only runs in a repo that has a `PLAN.md`**, the same gate `inject-plan.sh`
+uses. Opening Claude Code in someone's work repo should not quietly start
+committing to it; `/kickoff` writes `PLAN.md` at T+0, so a build is checkpointed
+from its first minute. `CC_CHECKPOINT_ANY=1` if you want it in every repo.
+
+Two kinds of commit, deliberately distinguishable:
+
+| | |
+|---|---|
+| `/fanout`'s green commits | verified — the rollback points |
+| `wip: checkpoint HH:MM` | a clock tick, nothing was checked |
+
+```sh
+git log --grep='^wip:' --invert-grep     # just the rollback points
+```
+
+It refuses rather than does damage: it skips a detached HEAD, a mid-merge or
+mid-rebase tree, a machine with no git identity (saying so, since `git commit`
+would otherwise fail silently forever), and a tree with 200+ changed paths, which
+means a missing `.gitignore` and not an hour of work. Untracked `.env`, `*.pem`,
+`*.tfvars`, `node_modules/`, `.venv/`, `target/` and friends are left out of the
+commit and named in the notice — tracked files are never second-guessed, since
+tracking one was already a decision. `--no-verify`, because a checkpoint a lint
+hook can veto is not a checkpoint.
+
+```sh
+CC_CHECKPOINT=0          # off
+CC_CHECKPOINT_MINS=10    # interval, default 10
+CC_CHECKPOINT_ANY=1      # checkpoint any git repo, PLAN.md or not
+CC_CHECKPOINT_PUSH=1     # also push to the branch's upstream — needed when the
+                         # person pairing has their own clone rather than a
+                         # worktree here. Off by default; pushing is your call.
+```
+
+`SubagentStop` is deliberately not wired: mid-fan-out the tree is three builders
+wide and not coherent until fan-in.
 
 ## Safety on a borrowed machine
 

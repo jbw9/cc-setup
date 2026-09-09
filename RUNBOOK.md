@@ -111,6 +111,12 @@ what you built, why, and how you work. `/pair` gets you ready:
 It lands what's in flight, runs `/handoff`, confirms `demo.sh` is green, and
 gives you a six-line walkthrough plus two or three candidates to pair on.
 
+**Make sure they can see your work.** The `Stop` hook has been committing `wip:`
+checkpoints every ten minutes, so the repo is close to current on its own — but
+if they're on their own clone rather than a worktree here, commits aren't enough.
+Set `CC_CHECKPOINT_PUSH=1` before the slot, or push by hand when `/pair` tells
+you to. Give them the branch and the last commit, not just "it's on main".
+
 **Have no agents running.** Three builders mid-flight makes you a spectator to
 your own project at the exact moment someone is watching you own it. Land the
 round first; pair on something you drive, or on one focused agent they can watch
@@ -132,7 +138,8 @@ writers in one file.
 
 If they'll run their own Claude Code, put them on a separate branch or worktree.
 Two agents in one working tree collide exactly like two builders, and neither
-knows it.
+knows it. A worktree here sees your checkpoints the moment they land; a separate
+clone does not, so that case needs `CC_CHECKPOINT_PUSH=1` and they need to pull.
 
 **What to hand off:** the workstream with the cleanest contract boundary and the
 least coupling to what you're doing live. Keep integration yourself.
@@ -179,7 +186,11 @@ If you used the global `install.sh` instead: `~/cc-setup-main/cleanup.sh`.
   if you've been reading the diffs at fan-in. Cut to the `MUST` tier and protect
   the demo path.
 - `demo.sh` red and the cause isn't obvious → `git reset --hard` to the last
-  green round's commit. That commit exists because `/fanout` makes it.
+  green round's commit. That commit exists because `/fanout` makes it. Find it
+  with `git log --grep='^wip:' --invert-grep`; the `wip:` checkpoints in between
+  were never verified and are not rollback points.
+- Checkpoint commits stopped appearing → read the notice the hook printed. Most
+  often it is an unset git identity or a 200+ path tree with no `.gitignore`.
 
 ## Deliberately not included
 | Thing | Why |

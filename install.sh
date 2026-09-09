@@ -57,16 +57,26 @@ json.dump(d,open(p,"w"),indent=2)
 PYX
 fi
 
-# SessionStart hook: re-inject PLAN.md on startup, resume, and after a compact
+# Hooks. SessionStart re-injects PLAN.md on startup, resume and after a compact.
+# Stop checkpoints the tree to git on a clock so a teammate pulling from this
+# repo is never stale; Stop only, never SubagentStop — mid-fan-out the tree is
+# three builders wide and not coherent until fan-in.
 if [ "$HAVE_PY" = 1 ]; then
   python3 - "$MINE" "$CDIR" <<'PYX'
 import json,sys
-p=sys.argv[1]; d=json.load(open(p))
-d.setdefault("hooks",{})["SessionStart"]=[{
+p, cdir = sys.argv[1], sys.argv[2]
+d = json.load(open(p))
+h = d.setdefault("hooks", {})
+h["SessionStart"] = [{
   "matcher":"startup|resume|compact",
   "hooks":[{"type":"command",
-            "command":f"{sys.argv[2]}/hooks/inject-plan.sh",
+            "command":f"{cdir}/hooks/inject-plan.sh",
             "timeout":10}],
+}]
+h["Stop"] = [{
+  "hooks":[{"type":"command",
+            "command":f"{cdir}/hooks/checkpoint.sh",
+            "timeout":20}],
 }]
 json.dump(d,open(p,"w"),indent=2)
 PYX
