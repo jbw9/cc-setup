@@ -30,27 +30,13 @@ installed with a populated cache costs a minute to start; one that needs a
 runtime install over guest wifi can cost thirty.** Make that a stack input
 before the clock starts, not a discovery at minute five.
 
-Then install. Needs no git and no GitHub account.
-
-**On their machine, use the isolated install.** It puts the whole environment in
-one folder, never reads or writes their `~/.claude`, and strips the `ANTHROPIC_*`
-and `CLAUDE_*` variables their shell profile may be exporting — a stray
-`ANTHROPIC_BASE_URL` silently repoints every request, and settings files cannot
-override an env var:
+Then install. Needs no git and no GitHub account:
 
     claude --version || curl -fsSL https://claude.ai/install.sh | bash
     curl -fsSL https://github.com/jbw9/cc-setup/archive/refs/heads/main.tar.gz \
-      | tar xz -C ~ && ~/cc-setup-main/isolate.sh
-    cd ~/cc-build
-    ./claude-iso                # the launcher — NOT `claude`
-    /login                      # scoped to this folder
+      | tar xz -C ~ && ~/cc-setup-main/install.sh
+    claude                      # /login if the account isn't yours
     /status                     # model opus, effort high, Setting sources
-
-Read what `isolate.sh` prints. It names the env vars it stripped, any ancestor
-`CLAUDE.md` that will load regardless (the upward walk can't be turned off — if
-one exists, build somewhere else), and any managed policy.
-
-Use `install.sh` instead only on a machine that is yours.
 
 Install **before** launching Claude. A SessionStart hook only fires at session
 start, so a session that's already running won't have it.
@@ -87,10 +73,11 @@ Keep `/decide` in reach the whole way. Every time you or Claude picks something
 with a real alternative, log it in the moment — you will not reconstruct it at
 hour three, and the `At scale:` lines are what `/scale` is built from.
 
-Watch two numbers on the status line: **context %** and **5h usage %**. Three
-Opus builders over a long build will find the usage limit. If it's past two
-thirds with a third of the clock left, drop to two concurrent or put
-`builder-fast` (Sonnet) for the mechanical workstreams.
+Watch **context %** on the status line, and check `/usage` now and then — three
+Opus builders over a long build will find the 5-hour limit, and the status line
+deliberately doesn't track it. If usage is past two thirds with a third of the
+clock left, drop to two concurrent builders or route the mechanical workstreams
+to `builder-fast` (Sonnet).
 
 ### Why the spine comes first
 
@@ -114,8 +101,9 @@ gives you a six-line walkthrough plus two or three candidates to pair on.
 **Make sure they can see your work.** The `Stop` hook has been committing `wip:`
 checkpoints every ten minutes, so the repo is close to current on its own — but
 if they're on their own clone rather than a worktree here, commits aren't enough.
-Set `CC_CHECKPOINT_PUSH=1` before the slot, or push by hand when `/pair` tells
-you to. Give them the branch and the last commit, not just "it's on main".
+Start the session with `CC_CHECKPOINT_PUSH=1 claude`, or push by hand when
+`/pair` tells you to. Give them the branch and the last commit, not just
+"it's on main".
 
 **Have no agents running.** Three builders mid-flight makes you a spectator to
 your own project at the exact moment someone is watching you own it. Land the
@@ -159,21 +147,16 @@ have only ever seen a machine run is a demo path you have not rehearsed.
 
 ## Before you hand the laptop back
 
-    ~/cc-build/teardown.sh      # scoped logout, then deletes the whole folder
+    ~/cc-setup-main/cleanup.sh  # logout + undo + wipe transcripts
     rm -rf ~/cc-setup-main
 
-Do not skip the logout. Settings, skills, transcripts and the account id all
-live inside `~/cc-build` and go with it — but on macOS the OAuth credential is
-in the login keychain, which no directory scoping reaches. `teardown.sh` runs
-the logout through the launcher so it targets your config and not theirs.
-
-If you used the global `install.sh` instead: `~/cc-setup-main/cleanup.sh`.
+`cleanup.sh` signs out, runs `uninstall.sh` to put their config back exactly as
+you found it, and removes the transcripts and history your session left behind.
+Don't skip the logout — it is the one thing `uninstall.sh` alone doesn't cover.
 
 ## If something goes wrong
 - No network → USB copy, or paste `home/CLAUDE.md` into the project root by hand.
   That alone gets you most of the value.
-- Ran `claude` instead of `./claude-iso` → you were using their config, not
-  yours. Quit, run the launcher, and re-check `/status`.
 - `python3` missing → `./install.sh --no-statusline` (the hook also no-ops
   silently without python3; the workflow still works, it just stops surviving
   compactions).

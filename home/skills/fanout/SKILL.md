@@ -20,7 +20,7 @@ Dispatch builders for the workstreams named in `$ARGUMENTS`, or every ready work
 - `builder` (Opus) — novel logic, anything where the plan leaves a judgment call, the workstream you'd struggle to specify precisely.
 - `builder-fast` (Sonnet) — mechanical breadth against a frozen contract: CRUD, wiring, rendering a known shape, boilerplate. Materially faster wall-clock, and the contract is doing the thinking.
 
-Route by how well-specified the workstream is, not by how important it is. A `MUST`-tier workstream that is completely pinned down by its contract is a `builder-fast` job. If the usage meter is past two thirds with a third of the clock left, route everything you can to `builder-fast`.
+Route by how well-specified the workstream is, not by how important it is. A `MUST`-tier workstream that is completely pinned down by its contract is a `builder-fast` job. If `/usage` is past two thirds with a third of the clock left, route everything you can to `builder-fast`.
 
 **Dispatch only `owner: builder` workstreams.** One owned by `me` or a teammate is off limits — sending an agent into a human's files while they work is the same race, and they can't see it coming. Use `/brief`.
 

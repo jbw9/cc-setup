@@ -27,7 +27,8 @@ Two agents editing one file race, and neither can see the other.
   file is a contract, not a workstream.
 - Contracts are frozen during a round. A builder that hits a bad one reports it;
   I change it here.
-- Max 3 concurrent builders (they inherit Opus). Watch the 5h usage meter.
+- Max 3 concurrent builders (they inherit Opus). Check `/usage` between rounds —
+  the status line deliberately shows only dir, model and context.
 - Never dispatch an agent onto a workstream a human owns. `/brief` instead.
 
 ## Code I have to defend
