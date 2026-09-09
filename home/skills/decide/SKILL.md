@@ -1,7 +1,7 @@
 ---
 name: decide
 description: Log an architecture decision to DECISIONS.md at the moment it is made, including the option rejected, the cost accepted, and where it breaks at scale.
-disable-model-invocation: true
+disable-model-invocation: false
 argument-hint: "[what was decided, or blank to capture the decision just made]"
 ---
 

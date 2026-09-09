@@ -100,7 +100,7 @@ NF=$(printf '%s\n' "$FILES" | wc -l | tr -d ' ')
 # --no-verify on purpose: a checkpoint that a repo's lint hook can veto is not a
 # checkpoint. /fanout still runs the real checks before its green commit.
 if ! git commit --quiet --no-verify \
-     -m "wip: checkpoint $(date +%H:%M) - $NF file(s)" -m "$FILES" >/dev/null 2>&1; then
+     -m "wip: $NF file(s) in progress" -m "$FILES" >/dev/null 2>&1; then
   git reset --quiet >/dev/null 2>&1
   exit 0
 fi

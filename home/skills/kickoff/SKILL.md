@@ -13,7 +13,9 @@ If `$ARGUMENTS` names a file, read it first. Notes taken during a briefing are w
 
 Ask before you plan. Use `AskUserQuestion`, batched, up to 4 per round. Keep going while the next question would still change what gets built. Stop when it wouldn't.
 
-If the user arrives with answers already — a brief, notes, a conversation they just had — do **one** round targeting genuine gaps only. Re-asking what they already told you is time off the clock.
+**Expect three rounds. Two is the floor.** A single round means you assumed rather than asked. This is the highest-leverage phase in the build: a wrong assumption here costs a whole fan-out round to unwind, a question costs thirty seconds. Bias toward asking.
+
+A long project description is **not** the same as answers. Someone can describe a product vividly and still have settled none of the six areas below. Only compress to one gap-filling round when the user hands you a **written brief or plan file** that already names the deadline, the stack, and what is out of scope — a conversation is not that.
 
 Cover, in roughly this order:
 
@@ -25,6 +27,21 @@ Cover, in roughly this order:
 6. **The clock.** Start time, deadline, and any fixed interruptions. Everything downstream is scheduled against these.
 
 State assumptions out loud rather than picking silently. If two readings lead to materially different builds, ask. If a simpler approach exists, say so before planning the complex one.
+
+**The stop test.** Do not leave Phase 1 silently. Walk the six areas and mark each *answered by them* or *assumed by me*, then say the assumed ones out loud in one short block:
+
+```
+Answered: done-means, clock, stack
+Assuming: no auth · seed data is fine · single user · desktop only
+Any of these wrong changes the partition — correct me now or I plan against them.
+```
+
+Anything in that list that would change the partition if wrong is a question you still owe. Ask it instead of stopping. Getting this wrong is not recoverable by working harder later: the partition, the contracts, and every builder dispatch all inherit it.
+
+Two specific things to force into the open, because they are the ones that quietly wreck a timed build:
+
+- **The demo's narrative.** Not "a dashboard" — the literal click-path or command sequence you will run in front of someone, in order. If they cannot say it as steps, the scope is not settled yet and no amount of planning fixes that.
+- **The one thing that must not be missing.** If everything else got cut, what single capability makes this still worth presenting? That answer sets the top of the tier list, and it is often not what they described first.
 
 ## Phase 2 — Draft the partition
 
@@ -72,9 +89,15 @@ This costs serial time and buys two things worth more than that time:
 ## Phase 5 — Freeze the contracts, then fan out
 
 1. **Derive the contracts from the spine.** Read what Phase 4 actually wrote — the real types, the real response shapes, the real function signatures. Lift them into their own files. This is the step the whole partition rests on: a builder coding against a described interface invents a different one; a builder coding against a file agrees by construction.
-2. Update `## Contracts` in `PLAN.md` with each contract's path. They are frozen from here.
-3. Note in `## Status` that Round 0 landed and `demo.sh` is green.
-4. Only then `/fanout` for `owner: builder` workstreams, `/brief` for the human ones.
+2. **If the build has a UI, freeze a design contract too.** This is the contract people forget, and its absence is invisible until fan-in: builders cannot see each other, so three of them independently reach for the same default gray scale and the result looks like three apps stapled together — or worse, like nothing, which at a company that cares about design reads as machine-generated on sight.
+
+   Write the tokens as a real file (`globals.css` in a Tailwind project, whatever the stack's equivalent is), semantic names only — surface, raised, border, ink, muted, one accent, plus a named color per domain state. Ten minutes, and it belongs in `## Contracts` beside `types.ts`.
+
+   Then put one line in every UI builder's dispatch: **use only these tokens — no raw palette classes, no hex literals.** A builder that hardcodes `gray-500` has not broken a rule anyone wrote down unless you write it down.
+
+3. Update `## Contracts` in `PLAN.md` with each contract's path. They are frozen from here.
+4. Run `/handoff` to write the first `STATUS.md` — Round 0 landed, `demo.sh` green, every workstream a row.
+5. Only then `/fanout` for `owner: builder` workstreams, `/brief` for the human ones.
 
 A builder that hits a bad contract reports it upward. You change it here, in the main thread, never them.
 
@@ -122,9 +145,10 @@ done-when:  `pnpm test api` passes
 <what only the main thread does: wiring, the parts that cross workstreams>
 
 ## Status
-<one line per workstream: not-started | in-progress | done | blocked>
-<this block is what gets re-injected after a compaction — keep it current and true>
+Live state is in `STATUS.md` (rewritten by `/handoff`).
 ```
+
+`PLAN.md` is the **plan** and should barely move after Round 0. Live state — what is happening now, what is left, what has bitten you — lives in `STATUS.md`, because a stable reference and a file that churns every few minutes cannot be the same document without both becoming unreadable.
 
 ## Rules
 

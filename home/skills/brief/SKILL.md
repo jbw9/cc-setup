@@ -53,4 +53,4 @@ Don't merge to main — I'm handling integration.
 - Say what's out of scope. It is the highest-value line in the brief.
 - If they'll drive their own Claude Code on this, tell them to work on their own branch or worktree. Two agents in one working tree collide the same way two builders do, and neither one knows it.
 
-After writing the brief, update `PLAN.md`: set the workstream's `owner:` and mark it `in-progress` in `## Status`.
+After writing the brief, set the workstream's `owner:` in `PLAN.md`, then run `/handoff` so `STATUS.md` shows the row as `in-progress` owned by them. A delegated task that is not on the board is one both of you will assume the other is doing.

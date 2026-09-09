@@ -22,6 +22,8 @@ Dispatch builders for the workstreams named in `$ARGUMENTS`, or every ready work
 
 Route by how well-specified the workstream is, not by how important it is. A `MUST`-tier workstream that is completely pinned down by its contract is a `builder-fast` job. If `/usage` is past two thirds with a third of the clock left, route everything you can to `builder-fast`.
 
+**`builder-fast` is the default.** Reach for `builder` only when you can name the judgment call the plan leaves open — an algorithm to choose, a schema shape to design, a tradeoff nobody has settled. If you can't name it in one line, the workstream is mechanical and the contract is doing the thinking: route it fast. On a timed build the default is what runs when you don't have time to deliberate, so it should be the cheap one.
+
 **Dispatch only `owner: builder` workstreams.** One owned by `me` or a teammate is off limits — sending an agent into a human's files while they work is the same race, and they can't see it coming. Use `/brief`.
 
 Skip anything whose `blocked-by` isn't satisfied. Next round.
@@ -41,6 +43,19 @@ Finish by running your done-when and reporting its real output.
 
 The builder reads its own instructions from `PLAN.md`. Your paraphrase can only introduce drift.
 
+**For any workstream that renders UI, append these lines verbatim.** They are constraints, not taste, and they have to travel in the dispatch: a builder cannot see the other builders' output, so "make it look consistent" is unactionable while "use these tokens" is checkable.
+
+```
+Use only the design tokens in <path>. No raw palette classes (gray-500, etc.),
+no hex literals outside that file.
+Avoid the tells: no ALL-CAPS letter-spaced eyebrow labels; no metadata strings
+joined with " · "; not every element on the same border-radius; one accent
+colour, used sparingly. Vary weight and size for hierarchy instead.
+Write real empty, loading and error states — never a bare spinner or blank div.
+```
+
+Two of those — the uppercase eyebrow and the middle-dot join — are the fastest visual giveaways that a screen was generated rather than designed, and they are exactly what a builder reaches for when the plan says "show the metadata".
+
 **While the round runs, the user is not idle.** This is the window for reading the *previous* round's diff, writing the `/decide` entries that got skipped, and rehearsing `./demo.sh`. Say so when you dispatch — the serial work is the build's real ceiling, and this is the only time it overlaps with anything.
 
 ## Fan in
@@ -49,9 +64,22 @@ The builder reads its own instructions from `PLAN.md`. Your paraphrase can only 
 2. Dispatch one `verifier` for the whole tree — not per workstream. Short verdict back, raw output stays out of this context.
 3. **Run `./demo.sh`.** A green typecheck with a broken demo path is the worst state to be in, because it looks fine. If the demo broke, that is the only thing that matters this round — fix it before anything else and say so plainly.
 4. **Read back what actually landed.** For each builder, read its diff and give the user at most ten lines: the files it wrote, the choices it made, and anything that differs from what the plan implied. This is not optional and not a formality — it is the only point where agent-written code enters a human's head. Code nobody has read cannot be explained later, and by then it is too late to learn it.
-5. Update `## Status` in `PLAN.md`. Real state only. Update `Last green` under `## Demo path`.
+5. **Run `/handoff`** to rewrite `STATUS.md`. Real state only. Roll every builder's `Blocked:` line and anything that cost real minutes into the problems log — this is the only moment those are recoverable. Update `Last green` under `## Demo path` in `PLAN.md`.
 6. **Harvest the `Decisions:` lines** from every builder report into `DECISIONS.md` (see `/decide`). This is the only moment they exist — each was made in a context that is now gone, and unrecorded they become choices in the codebase nobody can explain. Fill in `Costs us:` and `At scale:` yourself; the builder won't have.
-7. **Commit if the tree is green.** `git add -A && git commit` with a message naming the workstreams that landed. On a timed build this is not bookkeeping: it is the rollback point that makes the next round safe to attempt, and the log doubles as a record of the order things were built in. The `wip:` checkpoints the Stop hook has been making in between are not rollback points — nothing was verified when they were taken. This commit is the one that means something, so give it a real message.
+7. **Commit if the tree is green.** `git add -A && git commit`. On a timed build this is not bookkeeping: it is the rollback point that makes the next round safe to attempt, and the log doubles as a record of the order things were built in. The `wip:` checkpoints the Stop hook has been making in between are not rollback points — nothing was verified when they were taken. This commit is the one that means something, so give it a real message.
+
+   **Write it the way a developer on this project would.** Conventional-commit prefix, imperative subject under ~70 chars, describing the *change to the product* — never the orchestration that produced it:
+
+   ```
+   feat: rank transcripts by risk severity and surface the daily brief
+
+   - triage rules score each transcript, capped per kind
+   - dashboard reads the ranked queue from the brief API
+   ```
+
+   Prefix by what landed: `feat:` new capability · `fix:` bug · `test:` tests only · `refactor:` no behaviour change · `chore:` deps, config, scaffolding · `docs:` docs only. Mixed rounds take the prefix of the dominant change, or split into two commits when the parts are genuinely unrelated.
+
+   Never name workstream IDs, rounds, builders, agents, or models in the message. `WS7`, `Round 2b`, and `Sonnet rewrite` mean nothing to anyone reading this repo later and everything to someone asking who wrote it. The body says what changed and why, in the voice of someone who made the change themselves — because you are the one who will have to explain it.
 8. Handle the fallout **in the main thread**:
    - **BLOCKED on a contract** → decide the change yourself, edit the contract file, note it in `PLAN.md`, re-dispatch affected workstreams. Never let a builder renegotiate a contract.
    - **FAIL** → read the verifier's evidence. Small and inside one workstream: re-dispatch that builder with the error. Crosses workstreams: fix it here.

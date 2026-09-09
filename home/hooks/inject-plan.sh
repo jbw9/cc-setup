@@ -76,9 +76,25 @@ if time_block:
                      "demo rehearsal, and unlogged decisions only. Anything "
                      "unfinished is a CUT — say so rather than gambling the demo.")
 
-status = section(plan, "status")
-parts.append("## Status\n" + status if status else
-             "PLAN.md has no ## Status block yet. Run /handoff to write one.")
+# Live state lives in STATUS.md, not PLAN.md: the plan is stable and re-read in
+# full, status churns every few minutes, and mixing them makes both unreadable.
+# Prefer STATUS.md; fall back to a legacy `## Status` block so older repos still
+# re-inject something true.
+status_path = os.path.join(dir_, "STATUS.md")
+status = ""
+try:
+    status = open(status_path, encoding="utf-8", errors="replace").read().strip()
+except OSError:
+    pass
+
+if status:
+    head = status.splitlines()[:60]
+    parts.append("## Live status (from STATUS.md — rewrite it with /handoff)\n"
+                 + "\n".join(head))
+else:
+    legacy = section(plan, "status")
+    parts.append("## Status\n" + legacy if legacy else
+                 "No STATUS.md yet. Run /handoff to write one.")
 
 # The demo path is the one thing whose breakage is invisible to typecheck and
 # fatal at the deadline.

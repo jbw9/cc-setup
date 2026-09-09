@@ -14,7 +14,9 @@ dispatch, verify, log why.
   looks fine.
 - `DECISIONS.md` records every non-obvious choice **as it is made**, with the
   option it beat, the cost accepted, and where it breaks at scale. `/decide`.
-- Checkpoint with `/handoff` before a long fan-out or anything risky.
+- `STATUS.md` is my dashboard: what's happening now, what's left, what bit us.
+  `/handoff` rewrites it — every fan-in, before anything risky, whenever `Now`
+  stops being true. `PLAN.md` is the plan and barely moves; status churns.
 - `/pair` before someone joins, `/scale` for the production story, `/defend`
   before presenting.
 
@@ -27,8 +29,12 @@ Two agents editing one file race, and neither can see the other.
   file is a contract, not a workstream.
 - Contracts are frozen during a round. A builder that hits a bad one reports it;
   I change it here.
-- Max 3 concurrent builders (they inherit Opus). Check `/usage` between rounds —
-  the status line deliberately shows only dir, model and context.
+- Max 3 concurrent builders, and 2 is usually better — the third has the muddiest
+  boundary and pays back as serial integration. `builder` is pinned to Opus and
+  `builder-fast` to Sonnet, so the main thread's model doesn't leak into them;
+  `builder-fast` is the default unless the workstream leaves a nameable judgment
+  call. Check `/usage` between rounds — the status line deliberately shows only
+  dir, model and context.
 - Never dispatch an agent onto a workstream a human owns. `/brief` instead.
 
 ## Code I have to defend

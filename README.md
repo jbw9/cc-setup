@@ -99,10 +99,9 @@ landed. Throughput is not the constraint — explaining it afterwards is.
 | `home/hooks/inject-plan.sh` | `SessionStart` hook — re-injects `PLAN.md` status, demo path, contracts and the clock after a compaction |
 | `home/hooks/checkpoint.sh` | `Stop` hook — commits the tree every ~10 min so nobody pulling this repo is stale |
 | `home/statusline.py` | dir · model · context% used |
-| plugin | `frontend-design` from the official marketplace (best effort) |
+| `home/skills/frontend-design/` | vendored from the official marketplace — visual design guidance, no network needed |
 
-Flags: `--with-stitch` (Stitch/shadcn/Remotion/design-md skills),
-`--no-statusline`.
+Flags: `--no-statusline`.
 
 Two things that aren't installed but matter on a clock:
 `./preflight.sh` — five-second recon of a machine you're about to build on

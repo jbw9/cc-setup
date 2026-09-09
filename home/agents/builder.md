@@ -1,7 +1,7 @@
 ---
 name: builder
 description: Implements exactly one workstream from PLAN.md. Dispatch with the workstream ID and the absolute path to PLAN.md. Never dispatch two builders whose workstreams share an owned file.
-model: inherit
+model: opus
 effort: high
 color: blue
 ---

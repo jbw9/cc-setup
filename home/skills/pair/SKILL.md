@@ -14,7 +14,7 @@ Run this **before** they arrive, not when they're already sitting there.
 ## 1. Quiesce
 
 - Land whatever is in flight. Do **not** start a new `/fanout` round.
-- Run `/handoff` so `## Status` is current and true.
+- Run `/handoff` so `STATUS.md` is current and true.
 - Run `./demo.sh`. It must be green. This is what you open with.
 
 **No agents running while you pair.** Three builders mid-flight makes you a spectator to your own project at the exact moment someone is evaluating whether you own it. You want to be the one typing, or the one directing a single focused agent they can watch you steer.
@@ -50,7 +50,25 @@ Say which one you'd pick and why. Then let them choose — they may want to see 
 
 - Log decisions as they're made: `/decide`, attributed to whoever raised it. A suggestion they push you toward is a decision, and it belongs in the record with their name on it.
 - If they propose something you disagree with, say so and give the reason from `DECISIONS.md`. Disagreeing well is the thing being observed.
-- Keep `PLAN.md` open. Answering "where are you" from a live artifact beats answering from memory.
+- Keep `STATUS.md` open. Answering "where are you" from a live artifact beats answering from memory — and it beats scrolling this conversation, which is the failure mode that file exists to prevent.
+
+**Keep it true without being asked.** During a pairing slot, rewrite `STATUS.md` — at minimum the `Now` / `Next` lines — whenever any of these happen:
+
+- a task is finished, started, or handed to one of you
+- something becomes blocked, or unblocks
+- `./demo.sh` changes colour
+- you agree to cut something
+
+Say one line when you do it (`board updated — NOW: x`), never a paragraph. The cost is a few seconds; the thing it buys is that neither of you ever has to reconstruct state from memory in front of someone evaluating you.
+
+**Delegating during the slot.** Two of you and one repo is the same race as two builders. Split by file, not by feature:
+
+- **They take a slice you name by path**, exactly like a workstream — `owns:` globs, a `done-when` command, contracts frozen. If it is more than a few minutes of work, `/brief` it properly rather than describing it out loud.
+- **You keep integration and anything crossing files.** Same rule as `/fanout`: integration is never delegated.
+- **Never both in one file.** If you both need it, it is a contract — you write it, in front of them, before either of you moves.
+- **At most one agent running, and only one you are actively steering.** A background `/fanout` round during a pairing slot means neither of you owns what lands.
+
+Add a row to the board for anything they take, with `owner:` set to their name. A task that is not on the board is a task one of you will drop.
 
 ## 5. After
 

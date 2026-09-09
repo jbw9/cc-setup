@@ -3,7 +3,6 @@
 # Non-destructive: everything it overwrites is backed up, and uninstall.sh puts it back.
 #
 #   ./install.sh                 core setup (~2s)
-#   ./install.sh --with-stitch   + the Stitch/shadcn/Remotion design skills
 #   ./install.sh --no-statusline skip the python status line
 
 set -euo pipefail
@@ -13,9 +12,8 @@ STAMP="$(date +%Y%m%d-%H%M%S)"
 BACKUP="$CDIR/.pre-restore-backup-$STAMP"
 MANIFEST="$CDIR/.restore-manifest"
 
-WITH_STITCH=0; STATUSLINE=1
+STATUSLINE=1
 for a in "$@"; do case "$a" in
-  --with-stitch) WITH_STITCH=1 ;;
   --no-statusline) STATUSLINE=0 ;;
   -h|--help) sed -n '2,8p' "$0"; exit 0 ;;
   *) echo "unknown flag: $a" >&2; exit 1 ;;
@@ -118,12 +116,6 @@ for d in "$SRC/home/skills"/*/; do
   cp -R "$d" "$CDIR/skills/$n"; say "skill: $n"
 done
 
-if [ "$WITH_STITCH" = 1 ]; then
-  for d in "$SRC/optional/agents-skills"/*/; do
-    n="$(basename "$d")"; stash "$CDIR/skills/$n"; rm -rf "$CDIR/skills/$n"
-    cp -R "$d" "$CDIR/skills/$n"; say "skill: $n"
-  done
-fi
 
 # ---- agents ----------------------------------------------------------------
 for f in "$SRC/home/agents"/*.md; do
@@ -138,11 +130,10 @@ for f in "$SRC/home/hooks"/*.sh; do
 done
 
 # ---- plugins ---------------------------------------------------------------
-if command -v claude >/dev/null 2>&1; then
-  claude plugin marketplace add anthropics/claude-plugins-official >/dev/null 2>&1 || true
-  claude plugin install frontend-design@claude-plugins-official >/dev/null 2>&1 || true
-  say "plugin: frontend-design (best effort)"
-fi
+# frontend-design ships vendored in home/skills/ and is installed with the rest,
+# so a machine with no network or no marketplace still gets it. Nothing to do
+# here: the marketplace install was best-effort and silently did nothing when it
+# failed, which is the worst way to discover a missing skill on a clock.
 
 rm -f "$BACKUP/.mine.json"; rmdir "$BACKUP" 2>/dev/null || true
 cat <<EOF
