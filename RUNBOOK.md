@@ -62,7 +62,7 @@ prove it end to end before going wide, and stop building well before you stop.
 | | `/fanout` — further rounds. `/handoff` before anything long or risky. |
 | **T−45m** | **Freeze.** No new workstreams. Integration, demo rehearsal, backfilling `DECISIONS.md`. Unfinished work is a `CUT` — say so. |
 | **T−30m** | `/scale` → `SCALE.md`. |
-| **T−15m** | `/defend`. |
+| **T−15m** | `/defend` → rehearsal + `ARCHITECTURE.html`. Run it at T−30m if you have to present the architecture. |
 
 **While a round runs, you are not idle.** That is the window for reading the
 previous round's diff, writing the `/decide` entries you skipped, and rehearsing
@@ -135,12 +135,19 @@ least coupling to what you're doing live. Keep integration yourself.
 ## The last hour
 
     /scale     # -> SCALE.md, from the At scale: lines you've been logging
-    /defend    # interrogates the weakest choices, in AskUserQuestion rounds
+    /defend    # interrogates the weakest choices, then writes ARCHITECTURE.html
 
 `/defend` reads `PLAN.md`, `DECISIONS.md` and the diff. It flags decisions
 visible in the code that never made it into `DECISIONS.md` — those are the ones
 you'll get asked about with no answer ready. If that list is long, the read-back
 step at fan-in was being skipped.
+
+It then writes `ARCHITECTURE.html` at the repo root: the central design choice,
+how the pieces fit, what each choice beat, what is weak, and how it scales — with
+inline SVG diagrams and no external dependencies, so it opens on any laptop with
+no network. That is the artifact for a system-design round. Because the prose is
+built from your own answers in the interrogation, run `/defend` with enough time
+to answer properly — 30 minutes, not 10.
 
 Rehearse `./demo.sh` out loud at least once before presenting. A demo path you
 have only ever seen a machine run is a demo path you have not rehearsed.

@@ -74,8 +74,8 @@ this is shaped the way it is.
 | `/pair` | Someone is sitting down with you: lands what's in flight, quiesces the agents, and produces a 60-second walkthrough plus candidate tasks to pair on. |
 | `/brief` | Hands a workstream to a human teammate instead of an agent. |
 | `/decide` | Logs a choice to `DECISIONS.md` the moment it's made — with the option it beat, the cost, and where it breaks at scale. |
-| `/handoff` | Checkpoints state into `PLAN.md` so it survives a compaction. |
-| `/defend` | Rehearses the "why this over that" questions before you present. |
+| `/handoff` | Rewrites `STATUS.md` — what is happening now, what is left, and what has bitten you — in plain English, so it survives a compaction and a two-hour gap. |
+| `/defend` | Rehearses the "why this over that" questions before you present, then writes `ARCHITECTURE.html` — a self-contained page with diagrams you can present from. |
 | `/scale` | Turns the accumulated `At scale:` lines into `SCALE.md` — what breaks first, at what volume, and what replaces it. |
 
 Two ideas underneath all of it.
