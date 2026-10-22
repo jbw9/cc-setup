@@ -16,5 +16,6 @@ while read -r action path; do
               else echo "  !! no backup for $path — left as is"; fi ;;
   esac
 done < "$MANIFEST"
+rmdir "$CDIR/skills" 2>/dev/null || true  # install.sh made it; leave it if anything else lives there
 rm -f "$MANIFEST"
 echo "done. backup kept at: ${BACKUP:-none}"

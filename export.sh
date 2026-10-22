@@ -3,15 +3,10 @@
 set -euo pipefail
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CDIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
-SKILLS="eli5 recap frontend-design"
-MINE="kickoff fanout handoff brief decide defend pair scale karpathy-guidelines"
 
 cp "$CDIR/statusline.py" "$SRC/home/statusline.py"
-for f in "$CDIR"/agents/*.md;  do [ -e "$f" ] && cp "$f" "$SRC/home/agents/";  done
-for f in "$CDIR"/hooks/*.sh;   do [ -e "$f" ] && cp "$f" "$SRC/home/hooks/";   done
-for s in $SKILLS $MINE; do
-  [ -d "$CDIR/skills/$s" ] || continue
-  rm -rf "$SRC/home/skills/$s"; cp -RL "$CDIR/skills/$s" "$SRC/home/skills/$s"
+for n in $(ls "$SRC/home/skills"); do
+  [ -d "$CDIR/skills/$n" ] && { rm -rf "$SRC/home/skills/$n"; cp -RL "$CDIR/skills/$n" "$SRC/home/skills/$n"; }
 done
 find "$SRC" -name .DS_Store -delete
 echo "exported. NOTE: home/CLAUDE.md and home/settings.json are hand-maintained"

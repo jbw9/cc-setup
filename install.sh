@@ -2,7 +2,7 @@
 # Restore Jonathan's Claude Code setup on a machine that isn't his.
 # Non-destructive: everything it overwrites is backed up, and uninstall.sh puts it back.
 #
-#   ./install.sh                 core setup (~2s)
+#   ./install.sh                 everything (~1s)
 #   ./install.sh --no-statusline skip the python status line
 
 set -euo pipefail
@@ -15,12 +15,12 @@ MANIFEST="$CDIR/.restore-manifest"
 STATUSLINE=1
 for a in "$@"; do case "$a" in
   --no-statusline) STATUSLINE=0 ;;
-  -h|--help) sed -n '2,8p' "$0"; exit 0 ;;
+  -h|--help) sed -n '2,7p' "$0"; exit 0 ;;
   *) echo "unknown flag: $a" >&2; exit 1 ;;
 esac; done
 
 say() { printf '  %s\n' "$*"; }
-mkdir -p "$CDIR/skills" "$CDIR/agents" "$CDIR/hooks" "$BACKUP"
+mkdir -p "$CDIR/skills" "$BACKUP"
 : > "$MANIFEST"
 
 # back up a path before we touch it, and remember what we did
@@ -46,37 +46,16 @@ cp "$SRC/home/settings.json" "$MINE"
 HAVE_PY=0; command -v python3 >/dev/null 2>&1 && HAVE_PY=1
 [ "$HAVE_PY" = 1 ] || STATUSLINE=0
 
-if [ "$STATUSLINE" = 1 ]; then
-  python3 - "$MINE" "$CDIR" <<'PYX'
-import json,sys
-p=sys.argv[1]; d=json.load(open(p))
-d["statusLine"]={"type":"command","command":f"python3 {sys.argv[2]}/statusline.py"}
-json.dump(d,open(p,"w"),indent=2)
-PYX
-fi
-
-# Hooks. SessionStart re-injects PLAN.md on startup, resume and after a compact.
-# Stop checkpoints the tree to git on a clock so a teammate pulling from this
-# repo is never stale; Stop only, never SubagentStop — mid-fan-out the tree is
-# three builders wide and not coherent until fan-in.
+# Paths are injected here, not stored in home/settings.json, so they point at
+# this machine's config dir.
 if [ "$HAVE_PY" = 1 ]; then
-  python3 - "$MINE" "$CDIR" <<'PYX'
-import json,sys
-p, cdir = sys.argv[1], sys.argv[2]
+  python3 - "$MINE" "$CDIR" "$STATUSLINE" <<'PYX'
+import json, sys
+p, cdir, statusline = sys.argv[1], sys.argv[2], sys.argv[3] == "1"
 d = json.load(open(p))
-h = d.setdefault("hooks", {})
-h["SessionStart"] = [{
-  "matcher":"startup|resume|compact",
-  "hooks":[{"type":"command",
-            "command":f"{cdir}/hooks/inject-plan.sh",
-            "timeout":10}],
-}]
-h["Stop"] = [{
-  "hooks":[{"type":"command",
-            "command":f"{cdir}/hooks/checkpoint.sh",
-            "timeout":20}],
-}]
-json.dump(d,open(p,"w"),indent=2)
+if statusline:
+    d["statusLine"] = {"type": "command", "command": f"python3 {cdir}/statusline.py"}
+json.dump(d, open(p, "w"), indent=2)
 PYX
 fi
 
@@ -104,7 +83,7 @@ else
 fi
 
 # ---- status line -----------------------------------------------------------
-if [ "$STATUSLINE" = 1 ] && command -v python3 >/dev/null 2>&1; then
+if [ "$STATUSLINE" = 1 ]; then
   stash "$CDIR/statusline.py"
   cp "$SRC/home/statusline.py" "$CDIR/statusline.py"; chmod +x "$CDIR/statusline.py"
   say "statusline.py"
@@ -116,43 +95,13 @@ for d in "$SRC/home/skills"/*/; do
   cp -R "$d" "$CDIR/skills/$n"; say "skill: $n"
 done
 
-
-# ---- agents ----------------------------------------------------------------
-for f in "$SRC/home/agents"/*.md; do
-  n="$(basename "$f")"; stash "$CDIR/agents/$n"
-  cp "$f" "$CDIR/agents/$n"; say "agent: ${n%.md}"
-done
-
-# ---- hooks -----------------------------------------------------------------
-for f in "$SRC/home/hooks"/*.sh; do
-  n="$(basename "$f")"; stash "$CDIR/hooks/$n"
-  cp "$f" "$CDIR/hooks/$n"; chmod +x "$CDIR/hooks/$n"; say "hook: ${n%.sh}"
-done
-
-# ---- plugins ---------------------------------------------------------------
-# frontend-design ships vendored in home/skills/ and is installed with the rest,
-# so a machine with no network or no marketplace still gets it. Nothing to do
-# here: the marketplace install was best-effort and silently did nothing when it
-# failed, which is the worst way to discover a missing skill on a clock.
-
 rm -f "$BACKUP/.mine.json"; rmdir "$BACKUP" 2>/dev/null || true
 cat <<EOF
 
 done. next:
-  1. claude            # then /login if not signed in
-  2. /status           # confirm model=opus, effort=high
-  3. /kickoff <what you're building>
+  1. quit and relaunch claude   # the status line loads at startup
+  2. /status                    # confirm model=opus, effort=high
 
-workflow:  /kickoff -> spine -> /fanout -> /defend -> /scale
-  /kickoff   interrogate, build the spine, freeze contracts, write PLAN.md
-  /fanout    dispatch parallel builders, verify, read back the diffs, commit
-  /pair      get ready for someone sitting down with you mid-build
-  /brief     hand a workstream to a human teammate
-  /decide    log a choice the moment it's made
-  /handoff   checkpoint state so it survives a compaction
-  /defend    rehearse the architecture questions before you present
-  /scale     turn the At scale: lines into SCALE.md
-
-undo everything:  $SRC/uninstall.sh
+undo everything:      $SRC/uninstall.sh
 leaving the machine:  $SRC/cleanup.sh
 EOF
