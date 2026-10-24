@@ -3,9 +3,7 @@ name: karpathy-guidelines
 description: Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.
 license: MIT
 ---
-<!-- Vendored from github.com/multica-ai/andrej-karpathy-skills (MIT), 2026-09-03.
-     Sections 1-4 are also split into kickoff/, builder.md and verifier.md so they apply
-     where each belongs. This intact copy is for manual /karpathy-guidelines review passes. -->
+<!-- Vendored from github.com/multica-ai/andrej-karpathy-skills (MIT), 2026-09-03. -->
 
 # Karpathy Guidelines
 
