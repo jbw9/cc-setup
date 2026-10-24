@@ -1,0 +1,23 @@
+# Keep site/index.html and the README's "At a glance" block in step with home/.
+# A push made with GITHUB_TOKEN doesn't trigger workflows, so the commit below
+# can't loop.
+name: site
+on:
+  push:
+    branches: [main]
+    paths: ["home/**", "site/build.py", "README.md"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 site/build.py
+      - run: |
+          git diff --quiet -- site/index.html README.md && exit 0
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -qm "chore: rebuild the setup page" -- site/index.html README.md
+          git push

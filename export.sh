@@ -9,6 +9,7 @@ for n in $(ls "$SRC/home/skills"); do
   [ -d "$CDIR/skills/$n" ] && { rm -rf "$SRC/home/skills/$n"; cp -RL "$CDIR/skills/$n" "$SRC/home/skills/$n"; }
 done
 find "$SRC" -name .DS_Store -delete
+python3 "$SRC/site/build.py"
 echo "exported. NOTE: home/CLAUDE.md and home/settings.json are hand-maintained"
 echo "portable versions — diff them against $CDIR yourself:"
 echo "  diff $SRC/home/CLAUDE.md $CDIR/CLAUDE.md"
